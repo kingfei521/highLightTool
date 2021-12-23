@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/hightlight.css">
+    <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+
+    <div class="row grid-columns" id="all-div">
+        <!--    顶部按钮-->
+        <div id="col-md-11 col" class="block">
+            <div id="run" class="btn btn_secondary" onclick="run()">Run Start</div>
+            <div id="modify" class="btn btn_secondary" onclick="Modified()" style="display: none">Modify</div>
+            <div id="disable" class="btn btn_secondary" onclick="clear_all()" style="display: none">Clear all</div>
+        </div>
+        <!--        左边-->
+        <div class="col-md-10 col" id="mydiv">
+            <!--    左边的👈的头-->
+            <div class="language">
+                <label>Data Area</label>
+            </div>
+            <!--下面的文本框-->
+            <textarea name="message" id="data" class="input" type="text"> If the distance between us is 100 steps , I'm willing to walk 99 first , and then wait for you take that last step ,I'm willing to wait as long as it takes, because I LOVE YOU ！中国是世界第一大国，我国坚持改革开发以来，大力发展农作物经济，农民的生活水平提高。 中国万岁， 中国，加油！西安是一座文化古都</textarea>
+        </div>
+        <!--        右边-->
+        <div class="col-md-2 col" id="mydiv2">
+
+            <!--    右边的👈的头-->
+            <div class="language">
+                <label>Fields Area</label>
+            </div>
+            <textarea name="message" id="field" class="input">is
+to
+I'm
+To
+中国</textarea>
+        </div>
+
+
+    </div>
+
+
+
+    <script type="text/javascript" src="static/js/HighLightTextarea.min.js"></script>
+    <script type="text/javascript" src="static/js/tagsap.js"></script>
+    <script type="text/javascript">
+        var save_left_data = "";
+        var save_right_data = "";
+
+        //Run bt
+        function run(params) {
+            $("#run").hide();
+            $("#disable").show();
+            $("#modify").show();
+            //是否存在可执行元素
+            if($("#field").val() == "" && $("#data").val() == ""){
+                return;
+            }else{
+                tdg_highlight();
+            }
+            //缩小左边的边框
+            $(".highlightTextarea-container").width("1295")
+            $(".highlightTextarea-container").height("786")
+        };
+
+        //取消所有颜色背景
+        function clear_all(params) {
+            var all = $("span").each(function (j, items) {
+                items.style.backgroundColor = "#00000000";
+            });
+        }
+
+        //判断右边字段是否数量不是0
+        function is_zero_to_list(str, params) {
+            var new_l = [];
+            params.forEach(element => {
+               var is_count = calc_count(str, element);
+               if(is_count != 0){
+                   new_l.push(element);
+               } 
+            });
+            return new_l;
+        };
+
+        //Left标记颜色
+        function Mark_simple_left(words, value=true) {
+            $('textarea[id="data"]').highlightTextarea({
+                words:words,
+                caseSensitive:true,
+                is_all_setting: value
+            });
+        };
+
+        //Right标记颜色
+        function Mark_simple_right(words, value=false) {
+            $('textarea[id="field"]').highlightTextarea({
+                words:words,
+                caseSensitive:true,
+                is_all_setting: value
+            });
+        };
+
+        //修改按钮
+        function Modified() {
+            $("#run").show();
+            $("#list").remove();
+            $("#disable").hide();
+            $("#modify").hide();
+            if($("#mydiv").find("textarea[id='data']").length > 0){
+                return;
+            }else{
+                $("#all-div").find("div[class='highlightTextarea']").remove();
+                add_tag("mydiv", "data", save_left_data);
+                add_tag("mydiv2", "field", save_right_data);
+            };
+        };
+
+        //随机颜色
+        function getRandomColor_count(word, count, header) {
+            return {
+                color:"#" + (function (color) {
+                    return(color += "5678956789defdef" [Math.floor(Math.random() * 16)]) &&
+                    (color.length == 6) ? color : arguments.callee(color);
+                })(''), words: [word, count, header]
+            };
+        };
+
+        //去除空字符和空格
+        function trimSpace(array) {
+          for(var i =0; i<array.length; i++)
+          {
+              if(array[i] == "" || array[i] == null || typeof(array[i]) == "undefined"){
+                  array.splice(i, 1);
+                  i = i-1;
+              }
+          }  
+          return array;
+        };
+
+        //添加html标签
+        function add_tag(tagName, IdName, content) {
+            //先保存div中原来的标签
+            var tag = document.getElementById(tagName).innerHTML;
+            //构造新的内容
+            var couthml = '<textarea class="input" name="message" id="' + IdName + '">' + content + '</textarea>';
+            //追加内容
+            document.getElementById(tagName).innerHTML = tag + couthml;
+        };
+
+        //统计指定单词个数
+        function calc_count(testStr, armstr) {
+            var reg = RegExp("(?<=[\\W||^$])" + armstr[1] + "(?=[\\W||$])", "gm");
+            if(testStr.match(reg) == null){
+                return 0;
+            }
+            return testStr.match(reg).length;
+        };
+
+        //rgba转16进制
+        function hex_color(color) {
+            var values = color
+            .replace(/rgba?\(/, '')
+            .replace(/\)/, '')
+            .replace(/[\s+]/g, '')
+            .split(',');
+            var a = parseFloat(values[3] || 1);
+            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255);
+            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255);
+            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+            return '#' +
+            ("0" + r.toString(16)).slice(-2) +
+            ("0" + g.toString(16)).slice(-2) +
+            ("0" + b.toString(16)).slice(-2);
+        };
+
+
+        // 双击清除文本
+        $('#data').dblclick(function () {
+            $("#data").val("");
+        });
+
+        $('#field').dblclick(function () {
+            $("#field").val("");
+        });
+    </script>
+</body>
+</html>
